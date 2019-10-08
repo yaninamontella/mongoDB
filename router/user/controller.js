@@ -1,57 +1,67 @@
-const users = require('../../data/users.json')
+const User = require('../../models/user')
 
 const getAll = (req, res) => {
+  User.find({}, (err, users) => {
+    if (err) res.send({msg: 'Cant`t get the user list', error: err})
     res.send(users)
+  })
 }
+
 
 const getById = (req, res) => {
-    const paramId = Number(req.params.id)
-    const result = users.find( ({id}) => id === paramId)  
-    res.send(result)
+ /* const paramId = Number(req.params.id)
+  const query = { id:  { $eq: paramId } };
+  User.findOne(query, (err, user) => {
+    if (err) res.send({msg: 'Cant`t get the user', id:  req.params.id, error: err})
+    res.send(user)
+  })*/
+
+  const paramId = Number(req.params.id)
+  User.findById(paramId, (err, user) => {
+    if (err) res.send({msg: `Cant't get the user ${paramId}`, error: err})
+    res.send(user)
+  })
 }
 
-const insert = (req, res) => { 
-  const paramId = parseInt(req.body.id)
-  let user= users.find( ({id}) => id === paramId) 
-  if(user){
-    res.status(404).send({message: 'The User Already exist'})
-  }else{
-    users.push(req.body)
-    res.send({message: 'New user added' , data : users[paramId]})
-    }
+const insert = (req, res) => {
+  const newUser = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    phone: req.body.phone
+  })
+  /*User.insertOne({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password,
+    phone: req.body.phone
+  })*/
+
+  newUser.save((err) => {
+    if (err) res.send({msg: 'Cant`t save the user', error: err})
+    res.send('User saved')
+  })
 }
 
 const upsert = (req, res) => {
-  const paramId = parseInt(req.params.id)
-  let user= users.find( ({id}) => id === paramId) 
-  if(user){
-    user = { ...req.body, id: paramId}
-    res.send({message: 'Update Successfully!'});
-  }else{
-    res.status(404).send({message: 'User not found'})
-    }
+  User.updateOne({_id: req.params.id}, {...req.body}, (err) => {
+    if (err) res.send({msg: `Cant't upsert the user ${req.params.id}`, error: err})
+    res.send('Upsert Successfully!')
+  })
 }
 
 const update = (req, res) => {
-  const user = users.find(user => user.id == req.params.id);
-  if (user) {
-    user[Object.keys(req.body)] = req.body[Object.keys(req.body)];
-    res.send(user);
-  }
-  else {
-    res.send('user doesn´t exist');
-  }
+  User.updateOne({_id: req.params.id}, {[Object.keys(req.body)]: req.body[Object.keys(req.body)]}, (err) => {
+    if (err) res.send({msg: `Cant't update the user ${req.params.id}`, error: err})
+    res.send('Upsert Successfully!')
+  })
 }
 
 const remove = (req, res) => {
-  let paramId = parseInt(req.params.id)
-  let index= users.findIndex(element => element.id==paramId)
-  if(index===-1){
-    res.status(404).send({message: 'User not found'})
-  }else{
-    users.splice(index, 1)
-    res.send({message: 'Delete Successfully!'});
-  }
+  User.deleteOne({_id: req.params.id}, (err) => {
+    if (err) res.send({msg: `Cant't delete the user ${req.params.id}`, error: err})
+    res.send('Delete Successfully!')
+  }) 
 }
 
 module.exports = {
