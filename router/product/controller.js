@@ -32,22 +32,22 @@ const insert = (req, res) => {
 
 const upsert  = (req, res) => {
   Product.updateOne({_id: req.params.id}, {...req.body}, (err) => {
-    if (err) res.send({msg: `Cant't upsert the product`, id:  req.params.id, error: err})
+    if (err) res.send({msg: 'Cant`t upsert the product', id:  req.params.id, error: err})
     res.send('Upsert Successfully!')
   })
 }
 
 const update  = (req, res) => {
   Product.updateOne({_id: req.params.id}, {[Object.keys(req.body)]: req.body[Object.keys(req.body)]}, (err) => {
-    if (err) res.send({msg: `Cant't update the product`, error: err})
-    res.send('Updated Successfully!')
+    if (err) res.send({msg: 'Cant`t update the product', error: err})
+    res.send('Update Successfully!')
   })
 }
 
 const remove = (req, res) => {
   Product.deleteOne({_id: req.params.id}, (err) => {
-    if (err) res.send({msg: `Cant't delete the product`, error: err})
-    res.send('Deleted Successfully!')
+    if (err) res.send({msg: 'Cant`t delete the product', error: err})
+    res.send('Delete Successfully!')
   }) 
 }
 

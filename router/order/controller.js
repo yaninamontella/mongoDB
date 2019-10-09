@@ -1,62 +1,61 @@
+
+const Order = require('../../models/order')
+
 const getAll = (req, res) => {
+  Order.find({}, (err, orders) => {
+    if (err) res.send({msg: 'Cant`t get the order list', error: err})
     res.send(orders)
+  })
 }
 
 const getById = (req, res) => {
-    const paramId = Number(req.params.id)
-    const result = orders.find( ({id}) => id === paramId)  
-    res.send(result)
+  const query = { _id: req.params.id }
+  Order.findOne(query, (err, order) => {
+    if (err) res.send({msg: 'Cant`t get the order', id:  req.params.id, error: err})
+    res.send(order)
+  })
 }
 
-const insert = (req, res) => { 
-  const paramId = parseInt(req.body.id)
-  let order= orders.find( ({id}) => id === paramId) 
-  if(order){
-    res.status(404).send({message: 'The order Already exist'})
-  }else{
-    orders.push(req.body)
-    res.send({message: 'New order added' , data : orders[paramId]})
-    }
+const insert = (req, res) => {
+  const order = new Order({
+    date: req.body.date,
+    products: req.body.products,
+    user: req.body.user,
+    isActive: req.body.isActive,
+  })
+
+  order.save((err) => {
+    if (err) res.send({msg: 'Cant`t save the order', error: err})
+    res.send('Order added')
+  })
 }
 
-const upsert = (req, res) => {
-  const paramId = parseInt(req.params.id)
-  let order= orders.find( ({id}) => id === paramId) 
-  if(order){
-    order = { ...req.body, id: paramId}
-    res.send({message: 'Update Successfully!'});
-  }else{
-    res.status(404).send({message: 'order not found'})
-    }
+const upsert  = (req, res) => {
+  Order.updateOne({_id: req.params.id}, {...req.body}, (err) => {
+    if (err) res.send({msg: `Cant't upsert the order`, id:  req.params.id, error: err})
+    res.send('Upsert Successfully!')
+  })
 }
 
-const update = (req, res) => {
-  const order = orders.find(order => order.id == req.params.id);
-  if (order) {
-    order[Object.keys(req.body)] = req.body[Object.keys(req.body)];
-    res.send(order);
-  }
-  else {
-    res.send('order doesn´t exist');
-  }
+const update  = (req, res) => {
+  Order.updateOne({_id: req.params.id}, {[Object.keys(req.body)]: req.body[Object.keys(req.body)]}, (err) => {
+    if (err) res.send({msg: `Cant't update the order ${req.params.id}`, error: err})
+    res.send('Order updated')
+  })
 }
 
 const remove = (req, res) => {
-  let paramId = parseInt(req.params.id)
-  let index= orders.findIndex(element => element.id==paramId)
-  if(index===-1){
-    res.status(404).send({message: 'order not found'})
-  }else{
-    orders.splice(index, 1)
-    res.send({message: 'Delete Successfully!'});
-  }
+  Order.deleteOne({_id: req.params.id}, (err) => {
+    if (err) res.send({msg: `Cant't delete the order ${req.params.id}`, error: err})
+    res.send('Order deleted')
+  }) 
 }
 
 module.exports = {
-    getAll,
-    getById,
-    insert,
-    upsert,
-    update, 
-    remove
+  getAll,
+  getById,
+  insert,
+  upsert,
+  update,
+  remove
 }

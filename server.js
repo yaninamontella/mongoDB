@@ -7,7 +7,7 @@ const mongoose= require('mongoose')
 const app = express()
 const port = 5000
 
-const mongoDbUrl= 'mongodb+srv://yaninamontella:yanina123@cluster0-jbcus.mongodb.net/clase08'
+const mongoDbUrl= 'mongodb+srv://yaninamontella:yanina123@cluster0-jbcus.mongodb.net/test'
 
 app.use('/api', router)
 app.use(express.static('public'))
