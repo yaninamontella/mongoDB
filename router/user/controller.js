@@ -9,16 +9,9 @@ const getAll = (req, res) => {
 
 
 const getById = (req, res) => {
- /* const paramId = Number(req.params.id)
-  const query = { id:  { $eq: paramId } };
+ const query = { _id: req.params.id }
   User.findOne(query, (err, user) => {
     if (err) res.send({msg: 'Cant`t get the user', id:  req.params.id, error: err})
-    res.send(user)
-  })*/
-
-  const paramId = Number(req.params.id)
-  User.findById(paramId, (err, user) => {
-    if (err) res.send({msg: `Cant't get the user ${paramId}`, error: err})
     res.send(user)
   })
 }
@@ -30,16 +23,10 @@ const insert = (req, res) => {
     password: req.body.password,
     phone: req.body.phone
   })
-  /*User.insertOne({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    phone: req.body.phone
-  })*/
 
   newUser.save((err) => {
     if (err) res.send({msg: 'Cant`t save the user', error: err})
-    res.send('User saved')
+    res.send('User added')
   })
 }
 

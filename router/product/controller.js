@@ -1,62 +1,61 @@
+const Product = require('../../models/product')
+
 const getAll = (req, res) => {
+  Product.find({}, (err, products) => {
+    if (err) res.send({msg: 'Cant`t get de product list', error: err})
     res.send(products)
+  })
 }
 
 const getById = (req, res) => {
-    const paramId = Number(req.params.id)
-    const result = products.find( ({id}) => id === paramId)  
-    res.send(result)
+  const query = { _id: req.params.id }
+  Product.findOne(query, (err, product) => {
+    if (err) res.send({msg: 'Cant`t get the product', id:  req.params.id, error: err})
+    res.send(product)
+  })
 }
 
-const insert = (req, res) => { 
-  const paramId = parseInt(req.body.id)
-  let product= products.find( ({id}) => id === paramId) 
-  if(product){
-    res.status(404).send({message: 'The product Already exist'})
-  }else{
-    products.push(req.body)
-    res.send({message: 'New product added' , data : products[paramId]})
-    }
+const insert = (req, res) => {
+  const product = new Product({
+    name: req.body.name,
+    price: req.body.price,
+    stock: req.body.stock,
+    isVisible: req.body.isVisible,
+    isActive: req.body.isActive,
+  })
+
+  product.save((err) => {
+    if (err) res.send({msg: 'Cant`t save the product', id:  req.params.id, error: err})
+    res.send('Product added')
+  })
 }
 
-const upsert = (req, res) => {
-  const paramId = parseInt(req.params.id)
-  let product= products.find( ({id}) => id === paramId) 
-  if(product){
-    product = { ...req.body, id: paramId}
-    res.send({message: 'Update Successfully!'});
-  }else{
-    res.status(404).send({message: 'product not found'})
-    }
+const upsert  = (req, res) => {
+  Product.updateOne({_id: req.params.id}, {...req.body}, (err) => {
+    if (err) res.send({msg: `Cant't upsert the product`, id:  req.params.id, error: err})
+    res.send('Upsert Successfully!')
+  })
 }
 
-const update = (req, res) => {
-  const product = products.find(product => product.id == req.params.id);
-  if (product) {
-    product[Object.keys(req.body)] = req.body[Object.keys(req.body)];
-    res.send(product);
-  }
-  else {
-    res.send('product doesn´t exist');
-  }
+const update  = (req, res) => {
+  Product.updateOne({_id: req.params.id}, {[Object.keys(req.body)]: req.body[Object.keys(req.body)]}, (err) => {
+    if (err) res.send({msg: `Cant't update the product`, error: err})
+    res.send('Updated Successfully!')
+  })
 }
 
 const remove = (req, res) => {
-  let paramId = parseInt(req.params.id)
-  let index= products.findIndex(element => element.id==paramId)
-  if(index===-1){
-    res.status(404).send({message: 'product not found'})
-  }else{
-    products.splice(index, 1)
-    res.send({message: 'Delete Successfully!'});
-  }
+  Product.deleteOne({_id: req.params.id}, (err) => {
+    if (err) res.send({msg: `Cant't delete the product`, error: err})
+    res.send('Deleted Successfully!')
+  }) 
 }
 
 module.exports = {
-    getAll,
-    getById,
-    insert,
-    upsert,
-    update, 
-    remove
+  getAll,
+  getById,
+  insert,
+  upsert,
+  update,
+  remove
 }
